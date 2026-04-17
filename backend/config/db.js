@@ -1,48 +1,33 @@
 /**
  * config/db.js
  *
- * Returns a pool-like object.
- * Tries MySQL first; falls back to in-memory data if unavailable.
+ * MySQL Database connection pool.
  */
 
 'use strict';
 
-// ─── In-Memory Seed Data ────────────────────────────────────
-const SEED_PRODUCTS = [
-  { id: 1, name: 'Obsidian Wool Overcoat', price: '649.00', description: 'Cut from a double-faced Italian wool, this overcoat embodies restrained luxury. The structured silhouette falls to mid-calf, with a hidden placket, hand-stitched lapels, and a subtle chalk-stripe woven into the fabric. Dry clean only. Made in Naples.', image_url: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=800&q=90', category: 'Outerwear', created_at: new Date().toISOString() },
-  { id: 2, name: 'Cognac Leather Moto Jacket', price: '895.00', description: 'Sourced from a fourth-generation tannery in Cordoba, this full-grain cowhide develops a rich patina over time. The asymmetric zip closure, quilted lining, and ribbed cuffs are finished with antique brass hardware. A jacket built to outlast decades.', image_url: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&q=90', category: 'Outerwear', created_at: new Date().toISOString() },
-  { id: 3, name: 'Ecru Cashmere Turtleneck', price: '385.00', description: 'Woven from Grade-A Mongolian cashmere in a 2-ply construction for exceptional warmth without bulk. The elongated body, folded turtleneck, and ribbed hem make this the definitive cold-weather foundation piece.', image_url: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=90', category: 'Knitwear', created_at: new Date().toISOString() },
-  { id: 4, name: 'Merino Cable-Knit Cardigan', price: '295.00', description: 'An heirloom-quality cardigan in superfine merino, featuring a traditional Aran cable pattern updated with a boxy, relaxed fit. Mother-of-pearl buttons and a split hem complete the considered construction.', image_url: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&q=90', category: 'Knitwear', created_at: new Date().toISOString() },
-  { id: 5, name: 'Black Derby Oxford', price: '450.00', description: 'Goodyear-welted construction on a Dainite rubber sole means this shoe resolves indefinitely. The upper is cut from a single piece of smooth calfskin, with a sleek cap-toe and hand-burnished heel.', image_url: 'https://images.unsplash.com/photo-1614252234316-b1a6b8d5f4f8?w=800&q=90', category: 'Footwear', created_at: new Date().toISOString() },
-  { id: 6, name: 'Suede Chelsea Boot', price: '520.00', description: 'The Chelsea silhouette, perfected. Spanish nubuck suede sits over a leather-wrapped block heel, with elasticated side gussets for a precise fit.', image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=90', category: 'Footwear', created_at: new Date().toISOString() },
-  { id: 7, name: 'Silk Twill Pocket Square', price: '125.00', description: 'A 33cm square of hand-rolled silk twill, printed with an abstract topographical map of the Atlas Mountains. Each colourway is produced in a limited run of 200.', image_url: 'https://images.unsplash.com/photo-1594938298603-c8148c4b4a4a?w=800&q=90', category: 'Accessories', created_at: new Date().toISOString() },
-  { id: 8, name: 'Burnished Leather Bifold Wallet', price: '185.00', description: 'Slim profile, full substance. Eight card slots, a full-length bill compartment, and an ID window are organized in vegetable-tanned calf leather.', image_url: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&q=90', category: 'Accessories', created_at: new Date().toISOString() },
-  { id: 9, name: 'Poplin Bib-Front Dress Shirt', price: '210.00', description: 'Two-ply Egyptian cotton poplin with a bib-front panel for clean structure under a suit jacket. The spread collar and barrel cuffs are fused with a soft interlining.', image_url: 'https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?w=800&q=90', category: 'Shirts', created_at: new Date().toISOString() },
-  { id: 10, name: 'Indigo Chambray Work Shirt', price: '175.00', description: 'Japanese selvedge chambray in a vintage indigo that fades beautifully with wash. Patch chest pocket, single-needle stitching, and a slightly oversized fit.', image_url: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?w=800&q=90', category: 'Shirts', created_at: new Date().toISOString() },
-];
+const mysql = require('mysql2/promise');
 
-// ─── In-Memory Pool Mock ────────────────────────────────────
-const inMemoryPool = {
-  execute: async (sql, params) => {
-    const mapRow = (row) => ({
-      id: row.id,
-      name: row.name,
-      price: row.price,
-      description: row.description,
-      imageUrl: row.image_url,
-      category: row.category,
-      createdAt: row.created_at,
-    });
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || '127.0.0.1',
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || 'hxni_store',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
 
-    if (sql.includes('WHERE id = ?')) {
-      const id = Number(params[0]);
-      const found = SEED_PRODUCTS.filter(p => p.id === id).map(mapRow);
-      return [found];
-    }
-    return [SEED_PRODUCTS.map(mapRow)];
-  },
-};
+// Test the connection immediately on module load
+pool
+  .getConnection()
+  .then((conn) => {
+    console.log(`[db] Connected to MySQL database: ${process.env.DB_NAME || 'hxni_store'}`);
+    conn.release();
+  })
+  .catch((err) => {
+    console.error('[db] MySQL connection failed. Error:', err.message);
+  });
 
-console.log('[db] Using in-memory database with 10 seed products');
-
-module.exports = inMemoryPool;
+module.exports = pool;

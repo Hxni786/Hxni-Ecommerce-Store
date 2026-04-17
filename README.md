@@ -1,5 +1,11 @@
 # Hxni Ecommerce Store
 
+<p align="center">
+  <img src="./screenshot_home.png" width="300" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="./screenshot_product.png" width="300" />
+</p>
+
 > A production-quality mobile e-commerce application with an editorial serif aesthetic.
 > Built with React Native (Expo) + Node.js + Express + MySQL.
 
