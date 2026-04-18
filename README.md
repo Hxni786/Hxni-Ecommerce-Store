@@ -6,199 +6,147 @@
   <img src="./screenshot_product.png" width="300" />
 </p>
 
-> A production-quality mobile e-commerce application with an editorial serif aesthetic.
-> Built with React Native (Expo) + Node.js + Express + MySQL.
+> **Editorial Excellence meets E-commerce.**  
+> A high-end mobile shopping experience defined by a minimalist aesthetic, bespoke typography, and a robust full-stack architecture. Built to deliver seamless performance on Android and iOS using React Native (Expo), Node.js, and MySQL.
 
 ---
 
-## Stack
+## 🏗️ System Architecture
 
-| Layer      | Technology                                      |
-|------------|-------------------------------------------------|
-| Mobile     | React Native · Expo Go                          |
-| Navigation | React Navigation v6 (Native Stack)              |
-| Persistence| @react-native-async-storage/async-storage       |
-| Backend    | Node.js · Express.js                            |
-| Database   | MySQL 8                                         |
-| Fonts      | Playfair Display · Source Sans 3 · IBM Plex Mono|
+The application follows a modern decoupled architecture, ensuring clean separation of concerns between the mobile client and the headless API.
 
----
+```mermaid
+graph TD
+    subgraph "Client Layer (Mobile Application)"
+        A["React Native / Expo Go"] --> B["React Navigation v6"]
+        B --> C["Screens (Home, Details, Cart)"]
+        C --> D["Services (REST API & Storage)"]
+        D --> |"Local State"| J["@AsyncStorage"]
+    end
 
-## Design System
+    subgraph "Server Layer (Headless API)"
+        E["Express.js Server"] --> F["Secure Routes"]
+        F --> G["Controllers (asyncHandler)"]
+        G --> H["MySQL2 Connection Pool"]
+    end
 
-| Token       | Value       | Usage                            |
-|-------------|-------------|----------------------------------|
-| Background  | `#FAFAF8`   | Ivory — all screen backgrounds   |
-| Foreground  | `#1A1A1A`   | Rich black — text, filled buttons|
-| Accent      | `#B8860B`   | Antique gold — price, CTA border |
-| Border      | `#E8E4DF`   | Hairlines, dividers              |
-| Serif       | Playfair Display 700 Bold | Product names, headings |
-| Sans        | Source Sans 3 400/600     | Body copy, metadata     |
-| Mono        | IBM Plex Mono 400/500     | Labels, buttons, tags   |
+    subgraph "Data Layer"
+        I[("MySQL 8 Database")]
+    end
 
----
-
-## Project Structure
-
+    D -- "REST / JSON (HTTPS)" --> E
+    H -- "Optimized SQL Queries" --> I
 ```
+
+### Key Architectural Decisions
+- **Decoupled Frontend**: The mobile application communicates with the backend via a JSON REST API, allowing for future web or desktop expansion.
+- **Local Persistence**: Shopping cart data is persisted locally using `AsyncStorage`, ensuring the user's progress is saved across app restarts.
+- **Connection Pooling**: The backend utilizes a `mysql2/promise` connection pool to efficiently handle concurrent database requests.
+- **Editorial UI**: Designed with a focus on typography and negative space, leveraging `Playfair Display` for a luxury brand feel.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Mobile** | React Native · Expo Go |
+| **Navigation** | React Navigation v6 (Native Stack + Bottom Tabs) |
+| **Persistence** | @react-native-async-storage/async-storage |
+| **Backend** | Node.js (Runtime) · Express.js (Framework) |
+| **Database** | MySQL 8 (Relational Storage) |
+| **Typography** | Playfair Display (Serif) · Source Sans 3 (Sans) · IBM Plex Mono (Labels) |
+
+---
+
+## 🎨 Design System
+
+| Token | Value | Visual | Usage |
+| :--- | :--- | :--- | :--- |
+| **Background** | `#FAFAF8` | ![#FAFAF8](https://via.placeholder.com/15/FAFAF8/000000?text=+) | Ivory — Main canvas |
+| **Foreground** | `#1A1A1A` | ![#1A1A1A](https://via.placeholder.com/15/1A1A1A/000000?text=+) | Rich Black — Primary text |
+| **Accent** | `#B8860B` | ![#B8860B](https://via.placeholder.com/15/B8860B/000000?text=+) | Antique Gold — Branding |
+| **Border** | `#E8E4DF` | ![#E8E4DF](https://via.placeholder.com/15/E8E4DF/000000?text=+) | Hairlines & Dividers |
+
+---
+
+## 📂 Project Structure
+
+```bash
 hxni-ecommerce-store/
 ├── backend/
-│   ├── config/db.js                # MySQL2 connection pool
-│   ├── controllers/
-│   │   └── productController.js   # asyncHandler, SQL, validation
-│   ├── routes/
-│   │   └── productRoutes.js       # GET /api/products, /:id
-│   ├── .env.example               # Copy → .env and fill in creds
-│   ├── package.json
-│   └── server.js                  # Entry point, listens on 0.0.0.0
-│
+│   ├── config/db.js          # Database connection pooling
+│   ├── controllers/          # Business logic & SQL execution
+│   ├── routes/               # API endpoint definitions
+│   ├── server.js             # Entry point & middleware
+│   └── .env.example          # Environment configuration
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── ui/
-│   │   │   │   ├── CircularLogo.js   # Gold-bordered circular logo
-│   │   │   │   ├── EditorialText.js  # SerifHeading, SansBody, MonoLabel
-│   │   │   │   └── GoldButton.js     # Animated CTA, filled + outline
-│   │   │   └── product/
-│   │   │       ├── ProductCard.js    # 2-col grid card with press animation
-│   │   │       └── ProductImage.js   # 40% hero image with lazy load
-│   │   ├── navigation/
-│   │   │   └── AppNavigator.js      # Native stack (Home → Details)
-│   │   ├── screens/
-│   │   │   ├── HomeScreen.js        # Grid feed, pull-to-refresh, states
-│   │   │   └── DetailsScreen.js     # Hero image, cart logic, haptics, toast
-│   │   ├── services/
-│   │   │   ├── api.js               # Timeout-protected fetch wrapper
-│   │   │   └── storage.js           # Cart: get/add/remove/clear/count
-│   │   ├── theme/
-│   │   │   └── palette.js           # Colors, FontFamilies, Spacing, Shadows
-│   │   └── utils/
-│   │       └── formatters.js        # formatCurrency, truncate, categoryLabel
-│   ├── App.js                       # Font loading, SplashScreen, providers
-│   ├── app.json
-│   └── package.json
-│
+│   │   ├── components/       # Reusable UI (GoldButton, EditorialText)
+│   │   ├── navigation/       # Tab & Stack Navigators
+│   │   ├── screens/          # Core views (Home, Details, Cart)
+│   │   ├── services/         # API wrappers & AsyncStorage logic
+│   │   └── theme/            # Design tokens (Palette, Spacing)
+│   └── App.js                # Bootstrap & Global Providers
 └── db/
-    └── schema.sql                   # CREATE TABLE + 10 seed products
+    └── schema.sql            # MySQL Schema & Seed Data
 ```
 
 ---
 
-## Download & Installation
+## 🚀 Installation & Setup
 
-Scan the **Real Scanner** to download the production APK directly to your Android device, or view the **Branded Download Card**.
+### 1. Database Initialization
+Ensure MySQL is running, then execute the schema:
+```bash
+mysql -u root -p < db/schema.sql
+```
 
-<p align="center">
-  <img src="./qr_code.png" width="300" alt="Functional QR Scanner" />
-  <br />
-  <em>Scan this QR code with your phone camera or a scanner app to download the APK.</em>
-</p>
+### 2. Backend Configuration
+Navigate to the `backend` directory, install dependencies, and configure the environment:
+```bash
+cd backend
+npm install
+cp .env.example .env # Update with your DB credentials
+npm run dev
+```
+
+### 3. Frontend Deployment
+Update the `BASE_URL` in `frontend/src/services/api.js` to your local IP address, then start Expo:
+```bash
+cd frontend
+npm install
+npx expo start
+```
 
 ---
 
+## 📱 Download Preview
+
+Scan the QR code below to download the production APK (Android) or use the Direct Link.
+
 <p align="center">
-  <img src="./download_card.png" width="800" alt="Professional Download Card" />
+  <img src="./qr_code.png" width="220" alt="QR Code" />
 </p>
 
 <p align="center">
   <a href="https://expo.dev/artifacts/eas/3eVKpyrE2368mTk83CedWW.apk">
-    <strong>Direct Link: Download APK (Expo Artifact)</strong>
+    <strong>Download APK (v1.0.0)</strong>
   </a>
 </p>
 
 ---
 
-## Setup
+## ⚖️ API Reference
 
-### 1 — Database
-
-```bash
-mysql -u root -p < db/schema.sql
-```
-
-### 2 — Backend
-
-```bash
-cd backend
-
-# Copy and fill in your credentials
-cp .env.example .env
-#   DB_USER=root
-#   DB_PASSWORD=your_password
-#   DB_NAME=hxni_store
-#   PORT=3001
-
-npm install
-npm run dev
-# → Server listening on http://0.0.0.0:3001
-```
-
-### 3 — Find your LAN IP (for Expo Go on a physical device)
-
-```bash
-# macOS / Linux
-ifconfig | grep "inet " | grep -v 127.0.0.1
-
-# Windows
-ipconfig   # look for IPv4 Address
-```
-
-### 4 — Frontend
-
-Open `frontend/src/services/api.js` and update:
-
-```js
-const BASE_URL = 'http://192.168.x.x:3001/api';
-//                        ^^^^^^^^^^^
-//                        Your laptop's actual LAN IP
-```
-
-Then:
-
-```bash
-cd frontend
-npm install
-npx expo start
-# Scan QR code with Expo Go on your phone
-```
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/health` | Service uptime and status |
+| `GET` | `/api/products` | Retrieve all curated items |
+| `GET` | `/api/products/:id` | Detailed product view |
 
 ---
 
-## API Reference
-
-| Method | Endpoint              | Response                         |
-|--------|-----------------------|----------------------------------|
-| GET    | `/health`             | `{ status: "ok" }`               |
-| GET    | `/api/products`       | `{ data: Product[], count: n }`  |
-| GET    | `/api/products/:id`   | `{ data: Product }`              |
-
-### Product shape
-
-```ts
-{
-  id:          number
-  name:        string
-  price:       string        // e.g. "649.00"
-  description: string
-  imageUrl:    string        // aliased from image_url
-  category:    string
-  createdAt:   string        // ISO 8601 UTC
-}
-```
-
----
-
-## Cart Behaviour
-
-- Cart is persisted to `AsyncStorage` under the key `@hxni/cart`
-- Re-adding a product already in the cart **increments its quantity**
-- On success: medium haptic impact + animated slide-up toast
-- Cart survives app restarts (AsyncStorage is non-volatile)
-
----
-
-## Notes
-
-- The backend binds to `0.0.0.0` so it accepts connections from any network interface — required for Expo Go on a physical phone
-- `android.usesCleartextTraffic: true` and `NSAllowsArbitraryLoads: true` in `app.json` allow HTTP connections to your local dev server. **Remove these before shipping to production and switch to HTTPS.**
-- Fonts fall back gracefully to system fonts if `expo-google-fonts` packages fail to load (e.g. on first run before cache warms)
+<p align="center">
+  <em>Developed with ❤️ by Hxni. Built for the modern editor.</em>
+</p>
