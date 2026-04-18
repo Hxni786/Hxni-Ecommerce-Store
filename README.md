@@ -63,10 +63,10 @@ graph TD
 
 | Token | Value | Visual | Usage |
 | :--- | :--- | :--- | :--- |
-| **Background** | `#FAFAF8` | ![#FAFAF8](https://via.placeholder.com/15/FAFAF8/000000?text=+) | Ivory — Main canvas |
-| **Foreground** | `#1A1A1A` | ![#1A1A1A](https://via.placeholder.com/15/1A1A1A/000000?text=+) | Rich Black — Primary text |
-| **Accent** | `#B8860B` | ![#B8860B](https://via.placeholder.com/15/B8860B/000000?text=+) | Antique Gold — Branding |
-| **Border** | `#E8E4DF` | ![#E8E4DF](https://via.placeholder.com/15/E8E4DF/000000?text=+) | Hairlines & Dividers |
+| **Background** | `#FAFAF8` | ![#FAFAF8](https://placehold.co/15x15/FAFAF8/FAFAF8.png) | Ivory — Main canvas |
+| **Foreground** | `#1A1A1A` | ![#1A1A1A](https://placehold.co/15x15/1A1A1A/1A1A1A.png) | Rich Black — Primary text |
+| **Accent** | `#B8860B` | ![#B8860B](https://placehold.co/15x15/B8860B/B8860B.png) | Antique Gold — Branding |
+| **Border** | `#E8E4DF` | ![#E8E4DF](https://placehold.co/15x15/E8E4DF/E8E4DF.png) | Hairlines & Dividers |
 
 ---
 
