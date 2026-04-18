@@ -84,6 +84,30 @@ hxni-ecommerce-store/
 
 ---
 
+## Download & Installation
+
+Scan the **Real Scanner** to download the production APK directly to your Android device, or view the **Branded Download Card**.
+
+<p align="center">
+  <img src="./qr_code.png" width="300" alt="Functional QR Scanner" />
+  <br />
+  <em>Scan this QR code with your phone camera or a scanner app to download the APK.</em>
+</p>
+
+---
+
+<p align="center">
+  <img src="./download_card.png" width="800" alt="Professional Download Card" />
+</p>
+
+<p align="center">
+  <a href="https://expo.dev/artifacts/eas/3eVKpyrE2368mTk83CedWW.apk">
+    <strong>Direct Link: Download APK (Expo Artifact)</strong>
+  </a>
+</p>
+
+---
+
 ## Setup
 
 ### 1 — Database
