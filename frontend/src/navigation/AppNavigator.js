@@ -9,8 +9,8 @@
  *     └── CartTab → CartScreen
  */
 
-import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useCallback, useState, useContext } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -19,14 +19,31 @@ import { useFocusEffect } from '@react-navigation/native';
 import HomeScreen from '../screens/HomeScreen';
 import DetailsScreen from '../screens/DetailsScreen';
 import CartScreen from '../screens/CartScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 
-import { getCartCount } from '../services/storage';
+import { fetchCart } from '../services/api';
 import { Colors, FontSizes, Spacing, Shadows } from '../theme/palette';
+import { AuthContext } from '../context/AuthContext';
 
 // ─── Stacks ───────────────────────────────────────────────────
 
 const HomeStack = createNativeStackNavigator();
+const AuthStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const AuthStackNavigator = () => (
+  <AuthStack.Navigator
+    screenOptions={{
+      headerShown: false,
+      contentStyle: { backgroundColor: Colors.background },
+      animation: 'fade',
+    }}
+  >
+    <AuthStack.Screen name="Login" component={LoginScreen} />
+    <AuthStack.Screen name="Register" component={RegisterScreen} />
+  </AuthStack.Navigator>
+);
 
 const HomeStackNavigator = () => (
   <HomeStack.Navigator
@@ -60,19 +77,23 @@ const TabIcon = ({ label, emoji, focused }) => (
 const CartTabIcon = ({ focused }) => {
   const [count, setCount] = useState(0);
 
+  const loadCount = useCallback(() => {
+    fetchCart()
+      .then((res) => setCount(res.count || 0))
+      .catch(() => setCount(0));
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      getCartCount().then(setCount);
-    }, [])
+      loadCount();
+    }, [loadCount])
   );
 
   // Also update on an interval while this tab icon is visible
   React.useEffect(() => {
-    const interval = setInterval(() => {
-      getCartCount().then(setCount);
-    }, 2000);
+    const interval = setInterval(loadCount, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [loadCount]);
 
   return (
     <View style={styles.tabIconContainer}>
@@ -95,37 +116,54 @@ const CartTabIcon = ({ focused }) => {
 
 // ─── Main Navigator ───────────────────────────────────────────
 
-const AppNavigator = () => (
-  <NavigationContainer>
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: styles.tabBar,
-        tabBarShowLabel: false,
-        tabBarHideOnKeyboard: true,
-      }}
-    >
-      <Tab.Screen
-        name="HomeTab"
-        component={HomeStackNavigator}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon label="Shop" emoji="🏠" focused={focused} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="CartTab"
-        component={CartScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <CartTabIcon focused={focused} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  </NavigationContainer>
-);
+const AppNavigator = () => {
+  const { isLoading, userToken } = useContext(AuthContext);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
+        <ActivityIndicator size="large" color={Colors.accent} />
+      </View>
+    );
+  }
+
+  return (
+    <NavigationContainer>
+      {userToken == null ? (
+        <AuthStackNavigator />
+      ) : (
+        <Tab.Navigator
+          screenOptions={{
+            headerShown: false,
+            tabBarStyle: styles.tabBar,
+            tabBarShowLabel: false,
+            tabBarHideOnKeyboard: true,
+          }}
+        >
+          <Tab.Screen
+            name="HomeTab"
+            component={HomeStackNavigator}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <TabIcon label="Shop" emoji="🏠" focused={focused} />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="CartTab"
+            component={CartScreen}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <CartTabIcon focused={focused} />
+              ),
+            }}
+          />
+        </Tab.Navigator>
+      )}
+    </NavigationContainer>
+  );
+};
+
 
 // ─── Styles ───────────────────────────────────────────────────
 

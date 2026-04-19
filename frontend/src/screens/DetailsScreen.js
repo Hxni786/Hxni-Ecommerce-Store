@@ -39,7 +39,7 @@ import { SerifHeading, SansBody, MonoLabel } from '../components/ui/EditorialTex
 import GoldButton                            from '../components/ui/GoldButton';
 
 import { fetchProduct }                      from '../services/api';
-import { addToCartQuantity }                 from '../services/storage';
+import { addToCartAPI }                      from '../services/api';
 import {
   formatCurrency,
   categoryLabel,
@@ -171,7 +171,7 @@ const DetailsScreen = ({ route, navigation }) => {
     setAddingCart(true);
 
     try {
-      await addToCartQuantity(product, quantity);
+      await addToCartAPI(product.id, quantity);
 
       // Haptic feedback — medium impact feels premium without being jarring
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);

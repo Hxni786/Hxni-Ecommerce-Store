@@ -162,3 +162,30 @@ export const getCartCount = async () => {
   const cart = await getCart();
   return cart.reduce((acc, item) => acc + item.quantity, 0);
 };
+
+// ─── Auth Operations ──────────────────────────────────────────
+
+export const setAuthToken = async (token) => {
+  try {
+    await AsyncStorage.setItem('@hxni/token', token);
+  } catch (err) {
+    console.warn('[storage] setAuthToken failed:', err.message);
+  }
+};
+
+export const getAuthToken = async () => {
+  try {
+    return await AsyncStorage.getItem('@hxni/token');
+  } catch (err) {
+    console.warn('[storage] getAuthToken failed:', err.message);
+    return null;
+  }
+};
+
+export const removeAuthToken = async () => {
+  try {
+    await AsyncStorage.removeItem('@hxni/token');
+  } catch (err) {
+    console.warn('[storage] removeAuthToken failed:', err.message);
+  }
+};

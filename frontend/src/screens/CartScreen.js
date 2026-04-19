@@ -1,9 +1,3 @@
-/**
- * screens/CartScreen.js
- *
- * Full cart view with item list, quantity controls, and checkout summary.
- */
-
 import React, { useCallback, useState } from 'react';
 import {
   View,
@@ -18,7 +12,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import { SerifHeading, SansBody, MonoLabel } from '../components/ui/EditorialText';
 import GoldButton from '../components/ui/GoldButton';
-import { getCart, addToCart, removeFromCart, clearCart } from '../services/storage';
+import { fetchCart, removeFromCartAPI, clearCartAPI } from '../services/api';
 import { formatCurrency } from '../utils/formatters';
 import { Colors, Spacing, FontSizes, Shadows } from '../theme/palette';
 
@@ -32,10 +26,14 @@ const CartScreen = ({ navigation }) => {
       let active = true;
       const load = async () => {
         setLoading(true);
-        const items = await getCart();
-        if (active) {
-          setCart(items);
-          setLoading(false);
+        try {
+          const res = await fetchCart();
+          if (active) setCart(res.data || []);
+        } catch (err) {
+          console.warn('[CartScreen] fetchCart failed:', err.message);
+          if (active) setCart([]);
+        } finally {
+          if (active) setLoading(false);
         }
       };
       load();
@@ -44,8 +42,12 @@ const CartScreen = ({ navigation }) => {
   );
 
   const handleRemove = useCallback(async (productId) => {
-    const updated = await removeFromCart(productId);
-    setCart(updated);
+    try {
+      const res = await removeFromCartAPI(productId);
+      setCart(res.data || []);
+    } catch (err) {
+      console.warn('[CartScreen] removeFromCart failed:', err.message);
+    }
   }, []);
 
   const handleClear = useCallback(() => {
@@ -58,8 +60,12 @@ const CartScreen = ({ navigation }) => {
           text: 'Clear',
           style: 'destructive',
           onPress: async () => {
-            await clearCart();
-            setCart([]);
+            try {
+              await clearCartAPI();
+              setCart([]);
+            } catch (err) {
+              console.warn('[CartScreen] clearCart failed:', err.message);
+            }
           },
         },
       ]

@@ -17,6 +17,8 @@ require('dotenv').config();
 const express       = require('express');
 const cors          = require('cors');
 const productRoutes = require('./routes/productRoutes');
+const authRoutes    = require('./routes/authRoutes');
+const cartRoutes    = require('./routes/cartRoutes');
 
 // ─── App ────────────────────────────────────────────────────
 
@@ -38,7 +40,7 @@ app.use(
       if (allowedOrigins.includes(origin))         return callback(null, true);
       callback(new Error(`CORS: origin "${origin}" is not allowed.`));
     },
-    methods: ['GET'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // ensure POST ok
   })
 );
 
@@ -57,6 +59,8 @@ app.use((req, _res, next) => {
 // ─── Routes ─────────────────────────────────────────────────
 
 app.use('/api/products', productRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/cart', cartRoutes);
 
 // Health check — useful for uptime monitoring and CI
 app.get('/health', (_req, res) => {
