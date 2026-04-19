@@ -29,6 +29,7 @@ import ProductCard from '../components/product/ProductCard';
 import { fetchProducts } from '../services/api';
 import { getCartCount } from '../services/storage';
 import { Colors, Spacing, FontSizes, Shadows } from '../theme/palette';
+import { AuthContext } from '../context/AuthContext';
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -114,6 +115,7 @@ const NoResultsState = () => (
 
 const HomeScreen = ({ navigation }) => {
   const parentNav = useNavigation();
+  const { signOut } = React.useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -232,6 +234,11 @@ const HomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
+      <View style={styles.topActionsRow}>
+        <TouchableOpacity onPress={signOut} style={styles.signOutBtn}>
+          <MonoLabel style={styles.signOutText}>Sign Out</MonoLabel>
+        </TouchableOpacity>
+      </View>
       <Header cartCount={cartCount} onCartPress={handleCartPress} />
 
       {/* Filters */}
@@ -284,9 +291,22 @@ const styles = StyleSheet.create({
   },
 
   // Header
+  topActionsRow: {
+    paddingHorizontal: H_PADDING,
+    paddingTop: Spacing[2],
+    alignItems: 'flex-end',
+  },
+  signOutBtn: {
+    paddingVertical: Spacing[1],
+    paddingHorizontal: Spacing[2],
+  },
+  signOutText: {
+    fontSize: FontSizes.xs,
+    color: Colors.muted,
+  },
   header: {
     paddingHorizontal: H_PADDING,
-    paddingTop: Spacing[3],
+    paddingTop: Spacing[1],
     paddingBottom: Spacing[2],
     backgroundColor: Colors.background,
   },
