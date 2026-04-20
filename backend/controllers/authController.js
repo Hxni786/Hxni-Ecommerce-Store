@@ -34,7 +34,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // 1. Check if user already exists
   const [existing] = await pool.execute(SQL.FIND_USER_BY_EMAIL, [email]);
   if (existing.length > 0) {
-    return res.status(409).json({ error: 'User with this email already exists.' });
+    return res.status(409).json({ error: 'Email already registered.' });
   }
 
   // 2. Hash password
@@ -68,7 +68,7 @@ const loginUser = asyncHandler(async (req, res) => {
   // 1. Find user
   const [userRows] = await pool.execute(SQL.FIND_USER_BY_EMAIL, [email]);
   if (userRows.length === 0) {
-    return res.status(401).json({ error: 'Invalid credentials.' });
+    return res.status(401).json({ error: 'Invalid username or password.' });
   }
   
   const user = userRows[0];
@@ -76,7 +76,7 @@ const loginUser = asyncHandler(async (req, res) => {
   // 2. Verify password
   const isMatch = await bcrypt.compare(password, user.password_hash);
   if (!isMatch) {
-    return res.status(401).json({ error: 'Invalid credentials.' });
+    return res.status(401).json({ error: 'Invalid username or password.' });
   }
 
   // 3. Generate token

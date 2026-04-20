@@ -20,18 +20,20 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
   const { signIn } = useContext(AuthContext);
 
   const handleLogin = async () => {
+    setErrorMsg(null);
     if (!email || !password) {
-      Alert.alert('Missing Fields', 'Please enter both email and password.');
+      setErrorMsg('Please enter both email and password.');
       return;
     }
     setLoading(true);
     try {
       await signIn(email, password);
     } catch (e) {
-      Alert.alert('Login Failed', e.message || 'An error occurred.');
+      setErrorMsg(e.message || 'An error occurred.');
     } finally {
       setLoading(false);
     }
@@ -90,6 +92,10 @@ export default function LoginScreen({ navigation }) {
               onChangeText={setPassword}
             />
           </View>
+
+          {errorMsg ? (
+            <MonoLabel style={styles.errorText}>{errorMsg}</MonoLabel>
+          ) : null}
 
           <GoldButton
             label={loading ? 'Authenticating...' : 'Sign In'}
@@ -166,6 +172,12 @@ const styles = StyleSheet.create({
   },
 
   // Form
+  errorText: {
+    color: Colors.danger,
+    fontSize: 10,
+    letterSpacing: 1,
+    marginTop: -Spacing[2],
+  },
   formSection: {
     gap: Spacing[5],
     marginBottom: Spacing[8],

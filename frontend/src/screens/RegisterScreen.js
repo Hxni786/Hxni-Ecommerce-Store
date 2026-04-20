@@ -20,22 +20,24 @@ export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
   const { signUp } = useContext(AuthContext);
 
   const handleRegister = async () => {
+    setErrorMsg(null);
     if (!email || !password) {
-      Alert.alert('Missing Fields', 'Please enter both email and password.');
+      setErrorMsg('Please enter both email and password.');
       return;
     }
     if (password.length < 6) {
-      Alert.alert('Weak Password', 'Password must be at least 6 characters.');
+      setErrorMsg('Password must be at least 6 characters.');
       return;
     }
     setLoading(true);
     try {
       await signUp(email, password);
     } catch (e) {
-      Alert.alert('Registration Failed', e.message || 'An error occurred.');
+      setErrorMsg(e.message || 'Registration failed.');
     } finally {
       setLoading(false);
     }
@@ -87,13 +89,17 @@ export default function RegisterScreen({ navigation }) {
             <MonoLabel style={styles.inputLabel}>PASSWORD</MonoLabel>
             <TextInput
               style={styles.input}
-              placeholder="Minimum 6 characters"
+              placeholder="Create a password"
               placeholderTextColor={Colors.muted}
               secureTextEntry
               value={password}
               onChangeText={setPassword}
             />
           </View>
+
+          {errorMsg ? (
+            <MonoLabel style={styles.errorText}>{errorMsg}</MonoLabel>
+          ) : null}
 
           <GoldButton
             label={loading ? 'Creating Account...' : 'Create Account'}
@@ -170,6 +176,12 @@ const styles = StyleSheet.create({
   },
 
   // Form
+  errorText: {
+    color: Colors.danger,
+    fontSize: 10,
+    letterSpacing: 1,
+    marginTop: -Spacing[2],
+  },
   formSection: {
     gap: Spacing[5],
     marginBottom: Spacing[8],
