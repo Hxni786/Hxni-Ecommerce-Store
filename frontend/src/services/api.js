@@ -16,6 +16,10 @@ const fetchAPI = async (endpoint, options = {}) => {
     ...options.headers,
   };
 
+  if (token) {
+    console.log(`[Auth] Using Token: ${token.substring(0, 15)}...`);
+  }
+
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers,

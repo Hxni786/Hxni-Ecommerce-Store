@@ -26,6 +26,10 @@
     "android": {
       "package": "com.hxni.store"
     },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    },
     "plugins": [
       "expo-font"
     ],

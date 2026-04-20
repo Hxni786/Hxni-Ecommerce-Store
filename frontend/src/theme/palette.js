@@ -41,17 +41,17 @@ export const Colors = Object.freeze({
 // ─── Typography Scale ─────────────────────────────────────────
 
 export const FontFamilies = Object.freeze({
-  /** Editorial headings — Use safe generic serif for testing */
-  serif:       'serif',
-  serifItalic: 'serif',
+  /** Editorial headings */
+  serif:       'PlayfairDisplay-Bold',
+  serifItalic: 'PlayfairDisplay-BoldItalic',
 
   /** Body copy */
-  sans:        'sans-serif',
-  sansSemi:    'sans-serif',
+  sans:        'SourceSans3-Regular',
+  sansSemi:    'SourceSans3-SemiBold',
 
   /** Labels, buttons, tags */
-  mono:        'monospace',
-  monoMedium:  'monospace',
+  mono:        'IBMPlexMono-Regular',
+  monoMedium:  'IBMPlexMono-Medium',
 });
 
 export const FontSizes = Object.freeze({
