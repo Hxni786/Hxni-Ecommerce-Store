@@ -116,3 +116,23 @@ export const createOrderAPI = async () => {
 export const fetchOrders = async () => {
   return await fetchAPI('/orders');
 };
+
+// ─── Wishlist ────────────────────────────────────────────────
+
+/**
+ * Fetch user's wishlist items
+ */
+export const fetchWishlist = async () => {
+  return await fetchAPI('/wishlist');
+};
+
+/**
+ * Toggle an item in the wishlist
+ */
+export const toggleWishlistAPI = async (productId) => {
+  return await fetchAPI('/wishlist/toggle', {
+    method: 'POST',
+    body: JSON.stringify({ productId }),
+  });
+};
+

@@ -24,6 +24,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import OrderSuccessScreen from '../screens/OrderSuccessScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import OrderHistoryScreen from '../screens/OrderHistoryScreen';
+import WishlistScreen from '../screens/WishlistScreen';
 
 import { fetchCart } from '../services/api';
 import { Colors, FontSizes, Spacing, Shadows } from '../theme/palette';
@@ -67,6 +68,10 @@ const HomeStackNavigator = () => (
     <HomeStack.Screen 
       name="OrderHistory" 
       component={OrderHistoryScreen} 
+    />
+    <HomeStack.Screen 
+      name="Wishlist" 
+      component={WishlistScreen} 
     />
   </HomeStack.Navigator>
 );

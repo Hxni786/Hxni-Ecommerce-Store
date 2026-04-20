@@ -116,6 +116,7 @@ const NoResultsState = () => (
 const HomeScreen = ({ navigation }) => {
   const parentNav = useNavigation();
   const [products, setProducts] = useState([]);
+  const [wishlistIds, setWishlistIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -139,6 +140,19 @@ const HomeScreen = ({ navigation }) => {
       setRefreshing(false);
     }
   }, []);
+
+  const loadWishlist = useCallback(async () => {
+    try {
+      const res = await fetchWishlist();
+      setWishlistIds(new Set(res.data.map(i => i.id)));
+    } catch (err) {
+      console.error('Failed to load wishlist:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadWishlist();
+  }, [loadWishlist]);
 
   // Debounced search effect
   useEffect(() => {
@@ -177,6 +191,20 @@ const HomeScreen = ({ navigation }) => {
     parentNav.navigate('CartTab');
   }, [parentNav]);
 
+  const handleWishlistToggle = useCallback(async (productId) => {
+    try {
+      const res = await toggleWishlistAPI(productId);
+      setWishlistIds(prev => {
+        const next = new Set(prev);
+        if (res.inWishlist) next.add(productId);
+        else next.delete(productId);
+        return next;
+      });
+    } catch (err) {
+      console.error('Wishlist toggle failed:', err);
+    }
+  }, []);
+
   // ── Filtering ──────────────────────────────────────────────
 
   const categories = useMemo(() => {
@@ -197,10 +225,12 @@ const HomeScreen = ({ navigation }) => {
           product={item}
           onPress={handleProductPress}
           width={CARD_WIDTH}
+          isWishlisted={wishlistIds.has(item.id)}
+          onWishlistToggle={handleWishlistToggle}
         />
       </View>
     );
-  }, [handleProductPress]);
+  }, [handleProductPress, wishlistIds, handleWishlistToggle]);
 
   const renderBody = () => {
     if (loading) return <LoadingState />;

@@ -57,6 +57,10 @@ const ProfileScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('HomeTab', { screen: 'OrderHistory' })} 
           />
           <ProfileMenuItem 
+            label="My Wishlist" 
+            onPress={() => navigation.navigate('HomeTab', { screen: 'Wishlist' })} 
+          />
+          <ProfileMenuItem 
             label="Shipping Address" 
             onPress={() => {}} 
           />

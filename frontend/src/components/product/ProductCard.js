@@ -23,7 +23,7 @@ import { SerifHeading, SansBody, MonoLabel } from '../ui/EditorialText';
 import { Colors, Spacing, Shadows, FontSizes } from '../../theme/palette';
 import { formatCurrency, truncate, categoryLabel } from '../../utils/formatters';
 
-const ProductCard = ({ product, onPress, width }) => {
+const ProductCard = ({ product, onPress, width, isWishlisted = false, onWishlistToggle }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const imageSize = width ? width : '100%';
 
@@ -68,6 +68,17 @@ const ProductCard = ({ product, onPress, width }) => {
               {categoryLabel(product.category)}
             </MonoLabel>
           </View>
+
+          {/* Wishlist Heart */}
+          <TouchableOpacity
+            style={styles.wishlistBtn}
+            onPress={() => onWishlistToggle?.(product.id)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <SansBody style={[styles.heart, isWishlisted && styles.heartActive]}>
+              {isWishlisted ? '♥' : '♡'}
+            </SansBody>
+          </TouchableOpacity>
         </View>
 
         {/* Meta */}
@@ -126,6 +137,26 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: FontSizes.xs + 1,
+  },
+  wishlistBtn: {
+    position: 'absolute',
+    top: Spacing[2],
+    right: Spacing[2],
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Shadows.sm,
+  },
+  heart: {
+    fontSize: 18,
+    color: Colors.muted,
+    marginTop: 2, // nudge for alignment
+  },
+  heartActive: {
+    color: Colors.accent,
   },
 });
 
