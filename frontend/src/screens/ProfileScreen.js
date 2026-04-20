@@ -54,7 +54,7 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.menu}>
           <ProfileMenuItem 
             label="Order History" 
-            onPress={() => navigation.navigate('HomeStack', { screen: 'Orders' })} 
+            onPress={() => navigation.navigate('HomeTab', { screen: 'OrderHistory' })} 
           />
           <ProfileMenuItem 
             label="Shipping Address" 
