@@ -11,6 +11,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { Colors, Spacing, Shadows, FontFamilies, FontSizes } from '../theme/palette';
 import { SerifHeading, SansBody, MonoLabel } from '../components/ui/EditorialText';
 import CircularLogo from '../components/ui/CircularLogo';
@@ -20,20 +21,19 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null);
   const { signIn } = useContext(AuthContext);
+  const { showToast } = useToast();
 
   const handleLogin = async () => {
-    setErrorMsg(null);
     if (!email || !password) {
-      setErrorMsg('Please enter both email and password.');
+      showToast('Please enter both email and password.', 'error');
       return;
     }
     setLoading(true);
     try {
       await signIn(email, password);
     } catch (e) {
-      setErrorMsg(e.message || 'An error occurred.');
+      showToast(e.message || 'Invalid username or password.', 'error');
     } finally {
       setLoading(false);
     }
@@ -92,10 +92,6 @@ export default function LoginScreen({ navigation }) {
               onChangeText={setPassword}
             />
           </View>
-
-          {errorMsg ? (
-            <MonoLabel style={styles.errorText}>{errorMsg}</MonoLabel>
-          ) : null}
 
           <GoldButton
             label={loading ? 'Authenticating...' : 'Sign In'}
@@ -172,12 +168,6 @@ const styles = StyleSheet.create({
   },
 
   // Form
-  errorText: {
-    color: Colors.danger,
-    fontSize: 10,
-    letterSpacing: 1,
-    marginTop: -Spacing[2],
-  },
   formSection: {
     gap: Spacing[5],
     marginBottom: Spacing[8],

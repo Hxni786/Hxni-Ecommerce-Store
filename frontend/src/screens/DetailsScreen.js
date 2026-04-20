@@ -40,6 +40,7 @@ import GoldButton                            from '../components/ui/GoldButton';
 
 import { fetchProduct }                      from '../services/api';
 import { addToCartAPI }                      from '../services/api';
+import { useToast }                          from '../context/ToastContext';
 import {
   formatCurrency,
   categoryLabel,
@@ -57,41 +58,6 @@ import {
 const SCREEN_HEIGHT  = Dimensions.get('window').height;
 const IMAGE_FLEX     = 0.40; // 40% of screen height for hero image
 
-// ─── Toast Component ──────────────────────────────────────────
-
-const CartToast = ({ visible }) => {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(12)).current;
-
-  useEffect(() => {
-    if (!visible) return;
-
-    Animated.parallel([
-      Animated.spring(opacity,     { toValue: 1, useNativeDriver: true, speed: 20 }),
-      Animated.spring(translateY,  { toValue: 0, useNativeDriver: true, speed: 20, bounciness: 6 }),
-    ]).start(() => {
-      // Auto-dismiss after 2s
-      setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(opacity,    { toValue: 0, duration: 300, useNativeDriver: true }),
-          Animated.timing(translateY, { toValue: -8, duration: 300, useNativeDriver: true }),
-        ]).start();
-      }, 2000);
-    });
-  }, [visible]);
-
-  return (
-    <Animated.View
-      pointerEvents="none"
-      style={[
-        styles.toast,
-        { opacity, transform: [{ translateY }] },
-      ]}
-    >
-      <MonoLabel style={styles.toastText}>✓  Added to Cart</MonoLabel>
-    </Animated.View>
-  );
-};
 
 // ─── Back Button ──────────────────────────────────────────────
 
@@ -138,8 +104,8 @@ const DetailsScreen = ({ route, navigation }) => {
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState(null);
   const [addingCart, setAddingCart] = useState(false);
-  const [toastShown, setToastShown] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const { showToast } = useToast();
 
   // ── Data fetching ──────────────────────────────────────────
 
@@ -176,16 +142,15 @@ const DetailsScreen = ({ route, navigation }) => {
       // Haptic feedback — medium impact feels premium without being jarring
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-      // Trigger toast animation
-      setToastShown(false);           // reset first
-      requestAnimationFrame(() => setToastShown(true));
+      // Trigger global toast
+      showToast(`${quantity} piece${quantity > 1 ? 's' : ''} added to cart`, 'success');
     } catch (err) {
       // In production: surface a proper error toast here
-      console.warn('[DetailsScreen] addToCart failed:', err.message);
+      showToast(err.message || 'Could not add to cart.', 'error');
     } finally {
       setAddingCart(false);
     }
-  }, [product, addingCart, quantity]);
+  }, [product, addingCart, quantity, showToast]);
 
   // ── Render guards ──────────────────────────────────────────
 
@@ -310,10 +275,7 @@ const DetailsScreen = ({ route, navigation }) => {
         />
       </View>
 
-      {/* ── Cart toast ──────────────────────────────────────── */}
-      <View style={styles.toastAnchor} pointerEvents="none">
-        <CartToast visible={toastShown} />
-      </View>
+
     </SafeAreaView>
   );
 };
@@ -455,25 +417,6 @@ const styles = StyleSheet.create({
     ...Shadows.lg,
   },
 
-  // Toast
-  toastAnchor: {
-    position:   'absolute',
-    bottom:     100,
-    left:       0,
-    right:      0,
-    alignItems: 'center',
-  },
-  toast: {
-    backgroundColor:   Colors.foreground,
-    paddingVertical:   Spacing[3],
-    paddingHorizontal: Spacing[6],
-    ...Shadows.base,
-  },
-  toastText: {
-    color:         Colors.white,
-    letterSpacing: 1.5,
-    fontSize:      FontSizes.xs,
-  },
 
   // States
   fullScreenState: {

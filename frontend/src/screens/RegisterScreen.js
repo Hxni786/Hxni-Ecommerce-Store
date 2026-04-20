@@ -11,6 +11,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { Colors, Spacing, FontFamilies, FontSizes } from '../theme/palette';
 import { SerifHeading, SansBody, MonoLabel } from '../components/ui/EditorialText';
 import CircularLogo from '../components/ui/CircularLogo';
@@ -20,24 +21,23 @@ export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null);
   const { signUp } = useContext(AuthContext);
+  const { showToast } = useToast();
 
   const handleRegister = async () => {
-    setErrorMsg(null);
     if (!email || !password) {
-      setErrorMsg('Please enter both email and password.');
+      showToast('Please enter both email and password.', 'error');
       return;
     }
     if (password.length < 6) {
-      setErrorMsg('Password must be at least 6 characters.');
+      showToast('Password must be at least 6 characters.', 'error');
       return;
     }
     setLoading(true);
     try {
       await signUp(email, password);
     } catch (e) {
-      setErrorMsg(e.message || 'Registration failed.');
+      showToast(e.message || 'Registration failed.', 'error');
     } finally {
       setLoading(false);
     }
@@ -96,10 +96,6 @@ export default function RegisterScreen({ navigation }) {
               onChangeText={setPassword}
             />
           </View>
-
-          {errorMsg ? (
-            <MonoLabel style={styles.errorText}>{errorMsg}</MonoLabel>
-          ) : null}
 
           <GoldButton
             label={loading ? 'Creating Account...' : 'Create Account'}
@@ -176,12 +172,6 @@ const styles = StyleSheet.create({
   },
 
   // Form
-  errorText: {
-    color: Colors.danger,
-    fontSize: 10,
-    letterSpacing: 1,
-    marginTop: -Spacing[2],
-  },
   formSection: {
     gap: Spacing[5],
     marginBottom: Spacing[8],
