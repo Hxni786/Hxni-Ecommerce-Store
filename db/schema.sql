@@ -125,3 +125,34 @@ INSERT INTO products (name, price, description, image_url, category) VALUES
  'Japanese selvedge chambray in a vintage indigo that fades beautifully with wash. Patch chest pocket, single-needle stitching, and a slightly oversized fit designed to be worn tucked or untucked. A workhorse piece with a refined finish.',
  'https://images.unsplash.com/photo-1603252109303-2751441dd157?w=800&q=90',
  'Shirts');
+
+-- ─────────────────────────────────────────────
+--  TABLE: orders
+-- ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS orders (
+  id          INT           NOT NULL AUTO_INCREMENT,
+  user_id     INT           NOT NULL,
+  total_price DECIMAL(10,2) NOT NULL,
+  status      VARCHAR(50)   NOT NULL DEFAULT 'pending',
+  created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────
+--  TABLE: order_items
+-- ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS order_items (
+  id          INT           NOT NULL AUTO_INCREMENT,
+  order_id    INT           NOT NULL,
+  product_id  INT           NOT NULL,
+  quantity    INT           NOT NULL,
+  price_at_purchase DECIMAL(10,2) NOT NULL, -- Keep historical price
+
+  PRIMARY KEY (id),
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

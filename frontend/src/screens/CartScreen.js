@@ -12,13 +12,14 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import { SerifHeading, SansBody, MonoLabel } from '../components/ui/EditorialText';
 import GoldButton from '../components/ui/GoldButton';
-import { fetchCart, removeFromCartAPI, clearCartAPI } from '../services/api';
+import { fetchCart, removeFromCartAPI, clearCartAPI, createOrderAPI } from '../services/api';
 import { formatCurrency } from '../utils/formatters';
 import { Colors, Spacing, FontSizes, Shadows } from '../theme/palette';
 
 const CartScreen = ({ navigation }) => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   // Refresh cart every time screen is focused
   useFocusEffect(
@@ -49,6 +50,26 @@ const CartScreen = ({ navigation }) => {
       console.warn('[CartScreen] removeFromCart failed:', err.message);
     }
   }, []);
+
+  }, []);
+
+  const handleCheckout = useCallback(async () => {
+    if (cart.length === 0 || isCheckingOut) return;
+
+    setIsCheckingOut(true);
+    try {
+      const res = await createOrderAPI();
+      // res.data should contain orderId and total
+      navigation.navigate('OrderSuccess', {
+        orderId: res.orderId,
+        total: res.total,
+      });
+    } catch (err) {
+      Alert.alert('Checkout Failed', err.message || 'Could not process your order.');
+    } finally {
+      setIsCheckingOut(false);
+    }
+  }, [cart, navigation, isCheckingOut]);
 
   const handleClear = useCallback(() => {
     Alert.alert(
@@ -174,8 +195,10 @@ const CartScreen = ({ navigation }) => {
           </MonoLabel>
         </View>
         <GoldButton
-          label="Proceed to Checkout"
-          onPress={() => Alert.alert('Checkout', 'This is a demo — thank you for browsing Hxni!')}
+          label={isCheckingOut ? 'Processing...' : 'Proceed to Checkout'}
+          onPress={handleCheckout}
+          disabled={isCheckingOut}
+          loading={isCheckingOut}
           variant="filled"
           style={{ marginTop: Spacing[3] }}
         />

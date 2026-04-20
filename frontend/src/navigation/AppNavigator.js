@@ -21,6 +21,7 @@ import DetailsScreen from '../screens/DetailsScreen';
 import CartScreen from '../screens/CartScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import OrderSuccessScreen from '../screens/OrderSuccessScreen';
 
 import { fetchCart } from '../services/api';
 import { Colors, FontSizes, Spacing, Shadows } from '../theme/palette';
@@ -56,6 +57,11 @@ const HomeStackNavigator = () => (
   >
     <HomeStack.Screen name="Home" component={HomeScreen} />
     <HomeStack.Screen name="Details" component={DetailsScreen} />
+    <HomeStack.Screen 
+      name="OrderSuccess" 
+      component={OrderSuccessScreen} 
+      options={{ animation: 'fade' }}
+    />
   </HomeStack.Navigator>
 );
 

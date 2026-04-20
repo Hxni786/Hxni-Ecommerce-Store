@@ -83,7 +83,21 @@ export const removeFromCartAPI = async (productId) => {
 };
 
 export const clearCartAPI = async () => {
-  return await fetchAPI('/cart', {
-    method: 'DELETE',
-  });
+  return await fetchAPI('/cart', { method: 'DELETE' });
+};
+
+// ─── Orders ──────────────────────────────────────────────────
+
+/**
+ * Convert current cart to an Order
+ */
+export const createOrderAPI = async () => {
+  return await fetchAPI('/orders', { method: 'POST' });
+};
+
+/**
+ * Fetch user order history
+ */
+export const fetchOrders = async () => {
+  return await fetchAPI('/orders');
 };
