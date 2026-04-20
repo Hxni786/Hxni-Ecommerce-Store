@@ -36,8 +36,19 @@ const fetchAPI = async (endpoint, options = {}) => {
 
 // ─── Products ──────────────────────────────────────────────
 
-export const fetchProducts = async () => {
-  return await fetchAPI('/products');
+export const fetchProducts = async (params = {}) => {
+  let endpoint = '/products';
+  const query = new URLSearchParams();
+
+  if (params.search) query.append('search', params.search);
+  if (params.category) query.append('category', params.category);
+
+  const queryString = query.toString();
+  if (queryString) {
+    endpoint += `?${queryString}`;
+  }
+
+  return await fetchAPI(endpoint);
 };
 
 export const fetchProduct = async (id) => {

@@ -125,12 +125,12 @@ const HomeScreen = ({ navigation }) => {
 
   // ── Data fetching ──────────────────────────────────────────
 
-  const loadProducts = useCallback(async (isRefresh = false) => {
+  const loadProducts = useCallback(async (isRefresh = false, params = {}) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     setError(null);
     try {
-      const { data } = await fetchProducts();
+      const { data } = await fetchProducts(params);
       setProducts(data);
     } catch (err) {
       setError(err.message);
@@ -140,7 +140,17 @@ const HomeScreen = ({ navigation }) => {
     }
   }, []);
 
-  useEffect(() => { loadProducts(); }, [loadProducts]);
+  // Debounced search effect
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      loadProducts(false, { 
+        search: searchQuery, 
+        category: activeCategory 
+      });
+    }, 500); // Wait 500ms before searching
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, activeCategory, loadProducts]);
 
   const refreshCartCount = useCallback(async () => {
     const count = await getCartCount();
@@ -159,7 +169,9 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('Details', { productId: product.id });
   }, [navigation]);
 
-  const handleRefresh = useCallback(() => loadProducts(true), [loadProducts]);
+  const handleRefresh = useCallback(() => {
+    loadProducts(true, { search: searchQuery, category: activeCategory });
+  }, [loadProducts, searchQuery, activeCategory]);
 
   const handleCartPress = useCallback(() => {
     parentNav.navigate('CartTab');
@@ -172,17 +184,8 @@ const HomeScreen = ({ navigation }) => {
     return ['All', ...unique];
   }, [products]);
 
-  const filteredProducts = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    return products.filter((item) => {
-      const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
-      const matchesQuery =
-        query.length === 0 ||
-        item.name?.toLowerCase().includes(query) ||
-        item.description?.toLowerCase().includes(query);
-      return matchesCategory && matchesQuery;
-    });
-  }, [products, activeCategory, searchQuery]);
+  const filteredProducts = products; // Now filtered by server 
+
 
   // ── Renderers ──────────────────────────────────────────────
 
