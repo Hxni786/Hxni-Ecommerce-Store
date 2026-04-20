@@ -22,6 +22,7 @@ import CartScreen from '../screens/CartScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import OrderSuccessScreen from '../screens/OrderSuccessScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 import { fetchCart } from '../services/api';
 import { Colors, FontSizes, Spacing, Shadows } from '../theme/palette';
@@ -161,6 +162,15 @@ const AppNavigator = () => {
             options={{
               tabBarIcon: ({ focused }) => (
                 <CartTabIcon focused={focused} />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="ProfileTab"
+            component={ProfileScreen}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <TabIcon label="Me" emoji="👤" focused={focused} />
               ),
             }}
           />
